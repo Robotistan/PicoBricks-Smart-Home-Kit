@@ -1,6 +1,6 @@
 # PicoBricks Smart Home Kit
 
-PicoBricks Smart Home is an educational kit that allows you to develop your smart home scenarios by combining PicoBricks sensor modules and wooden parts. The PicoBricks Smart Home wooden educational kit includes RGB LED, Button, Red LED, Temperature and Humidity Sensor, Motor Driver, Buzzer  and LDR Sensor module.
+PicoBricks Smart Home is an educational kit that allows you to develop your smart home scenarios by combining PicoBricks sensor modules and wooden parts. The PicoBricks Smart Home wooden educational kit includes RGB LED, Button, Red LED, Temperature and Humidity Sensor, Motor Driver, Buzzer and LDR Sensor module.
 With these sensors and the Raspberry Pi Pico W microcontroller in the Smart Home Kit, you can create smart home projects using block-based or text-based coding tools. By utilizing the input and output sensors in the modules, you can diversify the usage scenarios of your smart home.
 In addition to developing basic electronics skills, algorithmic thinking, and problem-solving abilities, the process of assembling the wooden parts also enhances your motor skills and hand-eye coordination.
 
