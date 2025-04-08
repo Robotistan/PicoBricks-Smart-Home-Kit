@@ -4,7 +4,7 @@ PicoBricks Smart Home is an educational kit that allows you to develop your smar
 With these sensors and the Raspberry Pi Pico W microcontroller in the Smart Home Kit, you can create smart home projects using block-based or text-based coding tools. By utilizing the input and output sensors in the modules, you can diversify the usage scenarios of your smart home.
 In addition to developing basic electronics skills, algorithmic thinking, and problem-solving abilities, the process of assembling the wooden parts also enhances your motor skills and hand-eye coordination.
 
-![22](https://github.com/user-attachments/assets/2e5ae818-283e-4198-894d-faaed4a8c5f3)
+![22](https://github.com/user-attachments/assets/78fb8ee0-afd1-454a-9105-c3b90346c9e8)
 
 ## License
 
