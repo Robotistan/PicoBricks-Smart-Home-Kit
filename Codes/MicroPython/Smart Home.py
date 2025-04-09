@@ -66,9 +66,6 @@ def buttonInterruptHandler(event):
 # Configure button interrupt
 button.irq(trigger=Pin.IRQ_RISING, handler=buttonInterruptHandler)
 
-# Variable to track button press timing
-button_press_time = None 
-
 while True:
     # Automatic lighting with LDR sensor
     ldr_value = ldr.read_u16()
