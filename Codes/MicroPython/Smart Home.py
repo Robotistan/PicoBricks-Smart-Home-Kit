@@ -85,10 +85,8 @@ while True:
         pass  # Ignore errors if sensor fails
         
     temperature = dht_sensor.temperature
-    humidity = dht_sensor.humidity
     
     #print("TEMP:     {0:.2f}C".format(temperature))
-    #print("HUMIDITY: {0:.1f}%".format(humidity))
     
     # Automatically open/close the window based on temperature
     if temperature >= tempThreshold:
