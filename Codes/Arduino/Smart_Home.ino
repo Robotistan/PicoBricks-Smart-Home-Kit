@@ -1,6 +1,5 @@
 // Libraries
-#include "picobricks.h"     // Main hardware abstraction library for PicoBricks
-#include "pitches.h"        // Tone frequencies for the melody
+#include <picobricks.h>    
 
 // Pin Definition
 #define RGB_PIN 6           // RGB LED control pin
