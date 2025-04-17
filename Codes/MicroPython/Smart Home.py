@@ -8,10 +8,10 @@ import utime
 melody = [262, 330, 392, 523] # Notes (Hz)
 duration = 0.4 # Note duration in seconds
 
-windowOpen = 7000
+windowOpen = 2000
 windowClose = 4000
-doorOpen = 4000
-doorClose = 7000
+doorOpen = 2000
+doorClose = 4500
 
 tempThreshold = 25
 ldrThreshold = 8000
