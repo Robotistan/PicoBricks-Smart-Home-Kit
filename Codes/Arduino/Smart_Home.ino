@@ -30,10 +30,10 @@ unsigned long door_bell[][2] = {
 };
 
 // Servo angle settings for open/close
-int windowOpen = 90;
-int windowClose = 0;
-int doorOpen = 90;
-int doorClose = 0;
+int windowOpen = 0;
+int windowClose = 80;  
+int doorOpen = 0;
+int doorClose = 90; 
 
 // Threshold values for environment control
 int tempThreshold = 25;    // Temperature threshold (°C) to open the window
@@ -70,7 +70,7 @@ void playNote(int frequency, int duration) {
 void play_melody() {
   for (int thisNote = 0; thisNote < 4; thisNote++) {
     playNote(door_bell[thisNote][0], noteDuration);                 // Play note frequency
-    noteDuration = 110 * melody[thisNote][1];                       // Set duration
+    noteDuration = 110 * door_bell[thisNote][1];                       // Set duration
     delay(noteDuration * 0.2);                                      // Short pause between notes
   }
 }
