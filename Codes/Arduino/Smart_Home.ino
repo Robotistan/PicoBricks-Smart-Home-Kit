@@ -32,9 +32,11 @@ int windowClose = 80;
 int doorOpen = 0;
 int doorClose = 90;
 
-// Thresholds
-int tempThreshold = 27;
-int ldrThreshold = 85;
+// !! important:
+// These threshold values define the limits for temperature and light.
+// You can modify them according to your ambient environment.
+int tempThreshold = 27;   // Temperature limit (°C)
+int ldrThreshold = 85;    // Light level limit (LDR reading)
 
 // Melody
 unsigned long door_bell[][2] = {
