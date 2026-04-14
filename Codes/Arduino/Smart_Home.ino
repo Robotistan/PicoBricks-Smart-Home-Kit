@@ -1,134 +1,141 @@
-// Libraries
-#include <picobricks.h>    
+#include <Servo.h>
+#include <picobricks.h>
 
 // Pin Definition
-#define RGB_PIN 6           // RGB LED control pin
-#define LED_PIN 7           // LED pin
-#define BUTTON_PIN 10       // Button pin
-#define DHT_PIN 11          // DHT11 temperature sensor pin
-#define BUZZER_PIN 20       // Buzzer pin 
-#define MOTOR_1 21          // Servo motor 1 pin (Door)
-#define MOTOR_2 22          // Servo motor 2 pin (Window)
-#define LDR_PIN 27          // Light-dependent resistor (LDR) pin 
+#define RGB_PIN 6
+#define LED_PIN 7
+#define BUTTON_PIN 10
+#define DHT_PIN 11
+#define BUZZER_PIN 20
+#define MOTOR_1 21
+#define MOTOR_2 22
+#define LDR_PIN 27
 
-// Defines
-#define DECODE_NEC          // IR remote protocol definition 
-#define RGB_COUNT 1         // Number of RGB LEDs connected
+#define RGB_COUNT 1
+
+// Objects
+NeoPixel strip(RGB_PIN, RGB_COUNT);
+DHT11 dht(DHT_PIN);
+
+Servo servoDoor;
+Servo servoWindow;
 
 // Variables
-float temperature;          // Variable to hold temperature value
-int ldr;                    // Variable to hold LDR light level
-int noteDuration;           // Duration of a note
-int button = 0;             // Flag to track button press
+float temperature;
+int ldr;
+int button = 0;
+int noteDuration;
 
-// Melody for doorbell (frequency and duration)
+// Servo angles
+int windowOpen = 0;
+int windowClose = 80;
+int doorOpen = 0;
+int doorClose = 90;
+
+// Thresholds
+int tempThreshold = 27;
+int ldrThreshold = 85;
+
+// Melody
 unsigned long door_bell[][2] = {
-  {262, 1}, // C4
-  {330, 1}, // E4
-  {392, 1}, // G4
-  {523, 1}  // C5
+  {262, 1},
+  {330, 1},
+  {392, 1},
+  {523, 1}
 };
 
-// Servo angle settings for open/close
-int windowOpen = 0;
-int windowClose = 80;  
-int doorOpen = 0;
-int doorClose = 90; 
-
-// Threshold values for environment control
-int tempThreshold = 25;    // Temperature threshold (°C) to open the window
-int ldrThreshold = 95;     // Light threshold (%) to activate lighting
-
-// Function & Object Declarations
-NeoPixel strip (RGB_PIN, RGB_COUNT);       // RGB LED strip instance
-DHT11 dht(DHT_PIN);                        // DHT11 sensor instance
-ServoSimple ServoDoor(MOTOR_1);            // Servo motor for the door
-ServoSimple ServoWindow(MOTOR_2);          // Servo motor for the window
-
-// Interrupt handler for button press
+// Interrupt
 void buttonInterruptHandler() {
-  int buttonState = digitalRead(BUTTON_PIN);
-  if (buttonState == HIGH) {
-    button = 1;  // Set the flag to trigger doorbell routine
+  if (digitalRead(BUTTON_PIN) == LOW) {
+    button = 1;
   }
 }
 
-// Function to play a note using the buzzer
+// Buzzer
 void playNote(int frequency, int duration) {
-  long period = 1000000L / frequency;                  // Calculate the period of the wave
-  long cycles = (long)frequency * duration / 1000;     // Number of wave cycles
+  long period = 1000000L / frequency;
+  long cycles = (long)frequency * duration / 1000;
 
   for (long i = 0; i < cycles; i++) {
-    digitalWrite(BUZZER_PIN, HIGH);                    // Turn buzzer ON
+    digitalWrite(BUZZER_PIN, HIGH);
     delayMicroseconds(period / 2);
-    digitalWrite(BUZZER_PIN, LOW);                     // Turn buzzer OFF
+    digitalWrite(BUZZER_PIN, LOW);
     delayMicroseconds(period / 2);
   }
 }
 
-// Function to play the doorbell melody
 void play_melody() {
-  for (int thisNote = 0; thisNote < 4; thisNote++) {
-    playNote(door_bell[thisNote][0], noteDuration);                 // Play note frequency
-    noteDuration = 110 * door_bell[thisNote][1];                       // Set duration
-    delay(noteDuration * 0.2);                                      // Short pause between notes
+  for (int i = 0; i < 4; i++) {
+    noteDuration = 110 * door_bell[i][1];
+    playNote(door_bell[i][0], noteDuration);
+    delay(noteDuration * 0.2);
   }
 }
 
 void setup() {
-  Serial.begin(115200);                 // Start serial communication for debugging
+  Serial.begin(115200);
 
-  // Configure pin modes
   pinMode(LED_PIN, OUTPUT);
   pinMode(BUTTON_PIN, INPUT_PULLUP);
   pinMode(BUZZER_PIN, OUTPUT);
   pinMode(LDR_PIN, INPUT);
-  pinMode(MOTOR_1, OUTPUT);
-  pinMode(MOTOR_2, OUTPUT);
 
-  // Initialize servos
-  ServoDoor.begin();
-  ServoWindow.begin();
+  // Servo setup
+  servoDoor.attach(MOTOR_1);
+  servoWindow.attach(MOTOR_2);
 
-  // Move servos to default (closed) positions
-  ServoDoor.setAngle(doorClose);
-  ServoWindow.setAngle(windowClose);
+  servoDoor.write(doorClose);
+  servoWindow.write(windowClose);
 
-  // Set up interrupt for button press
-  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), buttonInterruptHandler, CHANGE);
+  // Interrupt
+  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), buttonInterruptHandler, FALLING);
 
-  // Initialize DHT sensor
+  // Sensor
   dht.begin();
 }
 
 void loop() {
-  // If button was pressed
+
+  // BUTTON CONTROL
   if (button == 1) {
-    digitalWrite(LED_PIN, HIGH);       // Turn ON the LED
-    play_melody();                     // Play the doorbell melody
-    digitalWrite(LED_PIN, LOW);        // Turn OFF the LED
+    digitalWrite(LED_PIN, HIGH);
 
-    ServoDoor.setAngle(doorOpen);      // Open the door
-    delay(2000);                       // Wait 2 seconds
-    ServoDoor.setAngle(doorClose);     // Close the door
-    button = 0;                        // Reset button flag
+    play_melody();
+
+    digitalWrite(LED_PIN, LOW);
+
+    servoDoor.write(doorOpen);
+
+    delay(2000);
+
+    servoDoor.write(doorClose);
+
+    button = 0;
   }
 
-  // Read light level and control RGB lighting
-  ldr = (100 - (analogRead(LDR_PIN) * 100) / 1023);  // Convert analog value to percentage
+  // LDR CONTROL
+  ldr = (100 - (analogRead(LDR_PIN) * 100) / 1023);
 
-  if (ldr > ldrThreshold){
-    strip.setPixelColor(0, 255, 255, 255); // Turn ON RGB light to white
+  Serial.print("LDR: ");
+  Serial.println(ldr);
+
+  if (ldr < ldrThreshold) {
+    strip.setPixelColor(0, 255, 255, 255);
   } else {
-    strip.setPixelColor(0, 0, 0, 0);       // Turn OFF RGB light
+    strip.setPixelColor(0, 0, 0, 0);
   }
 
-  // Read temperature and control window servo
-  temperature = dht.readTemperature();     // Read temperature in Celsius
+  // TEMPERATURE CONTROL
+  temperature = dht.readTemperature();
 
-  if (temperature >= tempThreshold){
-    ServoWindow.setAngle(windowOpen);      // Open window if too hot
+  Serial.print("Temp: ");
+  Serial.println(temperature);
+
+  if (temperature >= tempThreshold) {
+    servoWindow.write(windowOpen);
   } else {
-    ServoWindow.setAngle(windowClose);     // Close window if temperature is okay
+    servoWindow.write(windowClose);
   }
+
+  delay(100);
 }
